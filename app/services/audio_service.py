@@ -2,7 +2,6 @@
 import os
 import shutil
 from tempfile import NamedTemporaryFile
-from app.utils.audio_converter import convert_to_mp3
 from dotenv import load_dotenv
 from openai import OpenAI
 
@@ -15,11 +14,9 @@ async def process_audio(file):
         shutil.copyfileobj(file.file, temp)
         temp_path = temp.name
 
-    # 2. mp3 변환
-    mp3_path = convert_to_mp3(temp_path)
 
-    # 3. Whisper STT
-    with open(mp3_path, "rb") as audio_file:
+    # 2. Whisper STT
+    with open(temp_path, "rb") as audio_file:
         transcript = client.audio.transcriptions.create(
             model="gpt-4o-mini-transcribe",
             file=audio_file
@@ -27,8 +24,7 @@ async def process_audio(file):
 
     print("📝 STT 결과:", transcript.text)
 
-    # 4. 파일 정리
+    # 3. 파일 정리
     os.remove(temp_path)
-    os.remove(mp3_path)
 
     return transcript.text
