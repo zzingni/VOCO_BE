@@ -9,7 +9,7 @@ def test_stt():
     with open("tests/test.wav", "rb") as f:
         response = client.post(
             "/api/v1/audio/stt",
-            files={"file": ("test.wav", f, "audio/wav")}
+            files={"audio": ("test.wav", f, "audio/wav")}
         )
 
     assert response.status_code == 200

@@ -5,6 +5,6 @@ from app.services.audio_service import process_audio
 router = APIRouter()
 
 @router.post("/stt")
-async def speech_to_text(file: UploadFile = File(...)):
-    result = await process_audio(file)
+async def speech_to_text(audio: UploadFile = File(...)):
+    result = await process_audio(audio)
     return {"text": result}
