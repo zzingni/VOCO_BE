@@ -3,10 +3,9 @@ import os
 import shutil
 from tempfile import NamedTemporaryFile
 from dotenv import load_dotenv
-from openai import OpenAI
+from app.core.openai_client import client
 
 load_dotenv()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 async def process_audio(file):
     # 1. 임시 파일 저장

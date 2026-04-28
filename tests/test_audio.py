@@ -5,12 +5,18 @@ from app.main import app
 
 client = TestClient(app)
 
-def test_stt():
+def test_stt_full_pipeline():
     with open("tests/test.wav", "rb") as f:
         response = client.post(
             "/api/v1/audio/stt",
-            files={"audio": ("test.wav", f, "audio/wav")}
+            files={"file": ("test.wav", f, "audio/wav")}
         )
 
+    data = response.json()
+
     assert response.status_code == 200
-    assert "text" in response.json()
+    assert "text" in data
+    assert "analysis" in data
+    assert "feedback" in data
+
+    print(response.json())
