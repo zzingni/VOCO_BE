@@ -10,6 +10,7 @@ from app.services.feedback_service import generate_feedback
 from app.models.answer import Answer
 from app.models.question import Question
 from app.models.sentence_feedback import SentenceFeedback
+from app.services.repeated_word_service import save_repeated_words
 
 router = APIRouter()
 
@@ -43,6 +44,9 @@ async def stt(
         db.add(answer)
         db.commit()
         db.refresh(answer)  # 여기서 answer.id 생성됨
+
+        # 반복 단어 저장
+        save_repeated_words(db, answer.id, text)
 
         # 5. GPT 피드백 생성
         feedback_result = await generate_feedback(
