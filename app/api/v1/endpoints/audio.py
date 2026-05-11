@@ -33,6 +33,7 @@ router = APIRouter()
 async def stt(
     file: UploadFile = File(...),
     question_id: int = Form(...),
+    interview_id: int = Form(...),
     db: Session = Depends(get_db)
 ):
 
@@ -72,6 +73,7 @@ async def stt(
         # 6. Answer 저장
         answer = Answer(
             user_id=1,
+            interview_id=interview_id,
             question_id=question_id,
             stt_text=text
         )
@@ -132,6 +134,9 @@ async def stt(
 
     # 10. 응답
     return {
+
+        "interview_id": interview_id,
+
         "answer_id": answer.id,
 
         "question_id": question_id,

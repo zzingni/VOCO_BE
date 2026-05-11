@@ -8,6 +8,7 @@ from app.db.database import Base
 class Interview(Base):
     __tablename__ = "interview"
 
+    user_id = Column(Integer, default=1)
     id = Column(Integer, primary_key=True, index=True)
     interview_date = Column(TIMESTAMP, server_default=func.now())
 
