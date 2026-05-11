@@ -15,3 +15,5 @@ class Question(Base):
 
     created_at = Column(TIMESTAMP, server_default=func.now())
     status = Column(Boolean, default=True)
+
+    field = relationship("Field", back_populates="questions")
