@@ -47,7 +47,7 @@ def get_interview_history(
                 "id": field.id,
                 "main_category": field.main_category,
                 "sub_category": field.sub_category
-            },
+            } if field else None,
 
             "average_score":
                 round(float(avg_score), 1)
