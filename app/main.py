@@ -6,6 +6,7 @@ from app.api.v1.endpoints import question
 from app.api.v1.endpoints import report
 from app.api.v1.endpoints import field
 from app.api.v1.endpoints import history
+from app.api.v1.endpoints import interview
 
 app = FastAPI()
 
@@ -15,3 +16,4 @@ app.include_router(question.router, prefix="/api/v1")
 app.include_router(report.router, prefix="/api/v1")
 app.include_router(field.router, prefix="/api/v1")
 app.include_router(history.router, prefix="/api/v1")
+app.include_router(interview.router, prefix="/api/v1")

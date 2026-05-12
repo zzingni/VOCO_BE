@@ -1,6 +1,6 @@
 # app/api/v1/endpoints/interview.py
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Form
 from sqlalchemy.orm import Session
 
 from app.db.deps import get_db
@@ -13,11 +13,13 @@ router = APIRouter()
 # 면접 시작
 @router.post("/interview/start")
 def start_interview(
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    field_id: int = Form(...)
 ):
 
     interview = Interview(
-        user_id=1
+        user_id=1,
+        field_id = field_id
     )
 
     db.add(interview)

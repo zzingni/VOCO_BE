@@ -6,7 +6,6 @@ from app.db.deps import get_db
 
 from app.models.interview import Interview
 from app.models.answer import Answer
-from app.models.question import Question
 from app.models.field import Field
 from app.models.sentence_feedback import SentenceFeedback
 
@@ -14,35 +13,22 @@ router = APIRouter()
 
 
 @router.get("/interview/history")
-def get_interview_history(db: Session = Depends(get_db)):
+def get_interview_history(
+    db: Session = Depends(get_db)
+):
 
-    interviews = db.query(Interview).all()
+    interviews = db.query(Interview).filter(
+        Interview.user_id == 1
+    ).all()
 
     result = []
 
     for interview in interviews:
 
-        # 해당 면접의 답변들
-        answers = db.query(Answer).filter(
-            Answer.interview_id == interview.id
-        ).all()
-
-        if not answers:
-            continue
-
-        # 첫 질문 기준으로 분야 가져오기
-        first_question = db.query(Question).filter(
-            Question.id == answers[0].question_id
+        field = db.query(Field).filter(
+            Field.id == interview.field_id
         ).first()
 
-        field = None
-
-        if first_question:
-            field = db.query(Field).filter(
-                Field.id == first_question.field_id
-            ).first()
-
-        # 평균 점수 계산
         avg_score = db.query(
             func.avg(SentenceFeedback.score)
         ).join(
@@ -58,12 +44,14 @@ def get_interview_history(db: Session = Depends(get_db)):
             "interview_date": interview.interview_date,
 
             "field": {
-                "id": field.id if field else None,
-                "main_category": field.main_category if field else None,
-                "sub_category": field.sub_category if field else None
+                "id": field.id,
+                "main_category": field.main_category,
+                "sub_category": field.sub_category
             },
 
-            "average_score": round(float(avg_score), 1) if avg_score else 0
+            "average_score":
+                round(float(avg_score), 1)
+                if avg_score else 0
         })
 
     return {
