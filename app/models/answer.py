@@ -8,7 +8,7 @@ class Answer(Base):
     __tablename__ = "answer"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, default=1)
+    user_id = Column(Integer, ForeignKey("member.id"))
     question_id = Column(Integer, ForeignKey("question.id"), nullable=False)
     interview_id = Column(Integer, ForeignKey("interview.id"), nullable=False)
 
@@ -18,3 +18,4 @@ class Answer(Base):
 
     interview = relationship("Interview", back_populates="answers")
     question = relationship("Question")
+    member = relationship("Member", back_populates="answers")
