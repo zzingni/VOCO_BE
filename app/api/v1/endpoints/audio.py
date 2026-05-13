@@ -21,6 +21,8 @@ from app.models.answer import Answer
 from app.models.question import Question
 from app.models.sentence_feedback import SentenceFeedback
 from app.models.voice_feedback import VoiceFeedback
+from app.models.interview import Interview
+from app.models.field import Field
 
 from app.services.repeated_word_service import (
     save_repeated_words
@@ -48,6 +50,19 @@ async def stt(
 
     if not question:
         return {"error": "Invalid question_id"}
+
+    # 면접 분야 조회
+    interview = db.query(Interview).filter(
+        Interview.id == interview_id
+    ).first()
+    
+    field_name = None
+    if interview:
+        field = db.query(Field).filter(
+            Field.id == interview.field_id
+        ).first()
+        if field:
+            field_name = field.sub_category
 
     # 3. 임시 wav 저장
     with NamedTemporaryFile(
@@ -92,7 +107,8 @@ async def stt(
         # 7. GPT 문장 피드백 생성
         feedback_result = await generate_feedback(
             question.content,
-            text
+            text,
+            field_name
         )
 
         # 8. Sentence Feedback 저장
