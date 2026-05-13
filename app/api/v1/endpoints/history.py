@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import func
+from datetime import datetime
 
 from app.db.deps import get_db
 
@@ -22,8 +23,15 @@ def get_interview_history(
     ).all()
 
     result = []
+    total_score = 0
+    valid_score_count = 0
+    this_month_count = 0
+    
+    now = datetime.now()
 
     for interview in interviews:
+        if interview.interview_date and interview.interview_date.year == now.year and interview.interview_date.month == now.month:
+            this_month_count += 1
 
         field = db.query(Field).filter(
             Field.id == interview.field_id
@@ -37,6 +45,10 @@ def get_interview_history(
         ).filter(
             Answer.interview_id == interview.id
         ).scalar()
+
+        if avg_score:
+            total_score += float(avg_score)
+            valid_score_count += 1
 
         result.append({
             "interview_id": interview.id,
@@ -54,7 +66,11 @@ def get_interview_history(
                 if avg_score else 0
         })
 
+    overall_average = round(total_score / valid_score_count, 1) if valid_score_count > 0 else 0
+
     return {
         "count": len(result),
+        "this_month_count": this_month_count,
+        "overall_average": overall_average,
         "histories": result
     }
