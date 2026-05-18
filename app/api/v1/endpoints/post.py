@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from datetime import datetime
 
 from app.db.deps import get_db
 from app.models.post import Post
@@ -149,13 +150,13 @@ async def delete_post(
         raise HTTPException(status_code=404, detail="게시글이 존재하지 않습니다.")
 
     post.status = "DELETED"
+    post.deleted_at = datetime.utcnow()
 
     db.commit()
 
     return {
         "message": "게시글 삭제 완료"
     }
-
 
 # 태그 리스트 조회
 @router.get("/tag/list")
@@ -254,3 +255,75 @@ async def get_comment_list(db: Session = Depends(get_db)):
         })
 
     return result
+
+
+# 댓글 수정
+@router.put("/comment/update/{comment_id}")
+async def update_comment(
+    comment_id: int,
+    content: str,
+    db: Session = Depends(get_db)
+):
+
+    comment = (
+        db.query(Comment)
+        .filter(Comment.comment_id == comment_id)
+        .first()
+    )
+
+    if not comment:
+        raise HTTPException(
+            status_code=404,
+            detail="댓글이 존재하지 않습니다."
+        )
+
+    comment.content = content
+    comment.updated_at = datetime.utcnow()
+
+    db.commit()
+
+    return {
+        "message": "댓글 수정 완료"
+    }
+
+
+# 댓글 삭제
+@router.delete("/comment/delete/{comment_id}")
+async def delete_comment(
+    comment_id: int,
+    db: Session = Depends(get_db)
+):
+
+    comment = (
+        db.query(Comment)
+        .filter(Comment.comment_id == comment_id)
+        .first()
+    )
+
+    if not comment:
+        raise HTTPException(
+            status_code=404,
+            detail="댓글이 존재하지 않습니다."
+        )
+
+    now = datetime.utcnow()
+
+    # 부모 댓글 삭제
+    comment.deleted_at = now
+    comment.status = "DELETED"
+
+    # 자식 댓글 전체 삭제
+    replies = (
+        db.query(Comment)
+        .filter(Comment.parent_id == comment_id)
+        .all()
+    )
+
+    for reply in replies:
+        reply.deleted_at = now
+
+    db.commit()
+
+    return {
+        "message": "댓글 삭제 완료"
+    }
