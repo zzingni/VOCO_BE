@@ -183,6 +183,7 @@ async def create_comment(
     content: str,
     post_id: int,
     member_id: int,
+    parent_id: int | None = None,
     db: Session = Depends(get_db)
 ):
 
@@ -196,10 +197,25 @@ async def create_comment(
     if not post:
         raise HTTPException(status_code=404, detail="게시글을 찾을 수 없습니다.")
 
+    # 부모 댓글 검증
+    if parent_id:
+        parent_comment = (
+            db.query(Comment)
+            .filter(Comment.comment_id == parent_id)
+            .first()
+        )
+
+        if not parent_comment:
+            raise HTTPException(
+                status_code=404,
+                detail="부모 댓글이 존재하지 않습니다."
+            )
+
     new_comment = Comment(
         content=content,
         post_id=post_id,
         member_id=member_id,
+        parent_id=parent_id,
     )
 
     db.add(new_comment)
@@ -218,8 +234,9 @@ async def get_comment_list(db: Session = Depends(get_db)):
 
     comments = (
         db.query(Comment)
+        .join(Post, Comment.post_id == Post.post_id)
         .filter(Post.status == "ACTIVE")
-        .order_by(Post.created_at.desc())
+        .order_by(Comment.created_at.desc())
         .all()
     )
 
@@ -231,6 +248,7 @@ async def get_comment_list(db: Session = Depends(get_db)):
             "member_id": comment.member_id,
             "post_id": comment.post.post_id,
             "content": comment.content,
+            "parent_id": comment.parent_id,
             "created_at": comment.created_at,
             "nickname": comment.member.nickname
         })
