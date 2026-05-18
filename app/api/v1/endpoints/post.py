@@ -255,7 +255,10 @@ async def get_comment_list(db: Session = Depends(get_db)):
             "nickname": comment.member.nickname
         })
 
-    return result
+    return {
+        "count": len(result),
+        "comments": result
+    }
 
 
 # 댓글 수정
