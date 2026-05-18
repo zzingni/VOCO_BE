@@ -5,6 +5,7 @@ from app.db.deps import get_db
 from app.models.post import Post
 from app.models.member import Member
 from app.models.tag import Tag
+from app.models.comment import Comment
 
 router = APIRouter()
 
@@ -69,7 +70,8 @@ async def get_post_list(db: Session = Depends(get_db)):
             "image_url": post.image_url,
             "created_at": post.created_at,
             "member_id": post.member_id,
-            "tag_id": post.tag_id
+            "tag_id": post.tag_id,
+            "nickname": post.member.nickname
         })
 
     return result
@@ -101,7 +103,8 @@ async def get_post_detail(
         "image_url": post.image_url,
         "created_at": post.created_at,
         "member_id": post.member_id,
-        "tag_id": post.tag_id
+        "tag_id": post.tag_id,
+        "nickname": post.member.nickname
     }
 
 
@@ -161,7 +164,6 @@ async def get_tag_list(db: Session = Depends(get_db)):
     tags = (
         db.query(Tag)
         .filter(Tag.status == "ACTIVE")
-        .order_by(Tag.created_at.desc())
         .all()
     )
 
@@ -171,6 +173,66 @@ async def get_tag_list(db: Session = Depends(get_db)):
         result.append({
             "tag_id": tag.tag_id,
             "tag_name": tag.tag_name
+        })
+
+    return result
+
+# 댓글 작성
+@router.post("/comment/upload")
+async def create_comment(
+    content: str,
+    post_id: int,
+    member_id: int,
+    db: Session = Depends(get_db)
+):
+
+    member = db.query(Member).filter(Member.id == member_id).first()
+
+    if not member:
+        raise HTTPException(status_code=404, detail="사용자를 찾을 수 없습니다.")
+
+    post = db.query(Post).filter(Post.post_id == post_id).first()
+
+    if not post:
+        raise HTTPException(status_code=404, detail="게시글을 찾을 수 없습니다.")
+
+    new_comment = Comment(
+        content=content,
+        post_id=post_id,
+        member_id=member_id,
+    )
+
+    db.add(new_comment)
+    db.commit()
+    db.refresh(new_comment)
+
+    return {
+        "message": "댓글 작성 완료",
+        "comment_id": new_comment.comment_id
+    }
+
+
+# 댓글 리스트 조회
+@router.get("/comment/list")
+async def get_comment_list(db: Session = Depends(get_db)):
+
+    comments = (
+        db.query(Comment)
+        .filter(Post.status == "ACTIVE")
+        .order_by(Post.created_at.desc())
+        .all()
+    )
+
+    result = []
+
+    for comment in comments:
+        result.append({
+            "comment_id": comment.comment_id,
+            "member_id": comment.member_id,
+            "post_id": comment.post.post_id,
+            "content": comment.content,
+            "created_at": comment.created_at,
+            "nickname": comment.member.nickname
         })
 
     return result
