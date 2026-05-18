@@ -152,3 +152,25 @@ async def delete_post(
     return {
         "message": "게시글 삭제 완료"
     }
+
+
+# 태그 리스트 조회
+@router.get("/tag/list")
+async def get_tag_list(db: Session = Depends(get_db)):
+
+    tags = (
+        db.query(Tag)
+        .filter(Tag.status == "ACTIVE")
+        .order_by(Tag.created_at.desc())
+        .all()
+    )
+
+    result = []
+
+    for tag in tags:
+        result.append({
+            "tag_id": tag.tag_id,
+            "tag_name": tag.tag_name
+        })
+
+    return result

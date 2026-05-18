@@ -2,7 +2,6 @@ from sqlalchemy import Column, Integer, String, Boolean, Date, TIMESTAMP
 from sqlalchemy.orm import relationship
 from app.db.database import Base
 
-
 class Member(Base):
 
     __tablename__ = "member"
@@ -18,3 +17,6 @@ class Member(Base):
 
     interviews = relationship("Interview", back_populates="member")
     answers = relationship("Answer", back_populates="member")
+
+    posts = relationship("Post", back_populates="member")
+    comments = relationship("Comment", back_populates="member")

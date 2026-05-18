@@ -3,7 +3,6 @@ from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from app.db.database import Base
 
-
 class Post(Base):
 
     __tablename__ = "post"
@@ -23,4 +22,5 @@ class Post(Base):
     status =  Column(String(20), default="ACTIVE")
 
     member = relationship("Member", back_populates="posts")
+    comments = relationship("Comment", back_populates="post")
     tag = relationship("Tag", back_populates="posts")
