@@ -237,6 +237,7 @@ async def get_comment_list(db: Session = Depends(get_db)):
         db.query(Comment)
         .join(Post, Comment.post_id == Post.post_id)
         .filter(Post.status == "ACTIVE")
+        .filter(Comment.status == "ACTIVE")
         .order_by(Comment.created_at.desc())
         .all()
     )
@@ -321,6 +322,7 @@ async def delete_comment(
 
     for reply in replies:
         reply.deleted_at = now
+        reply.status = "DELETED"
 
     db.commit()
 
