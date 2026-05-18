@@ -1,5 +1,3 @@
-# app/api/v1/endpoints/interview.py
-
 from fastapi import APIRouter, Depends, Form
 from sqlalchemy.orm import Session
 
