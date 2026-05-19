@@ -2,3 +2,8 @@ from .member import Member
 from .comment import Comment
 from .post import Post
 from .tag import Tag
+from .answer import Answer
+from .company import Company
+from .interview import Interview
+from .question import Question
+from .field import Field
