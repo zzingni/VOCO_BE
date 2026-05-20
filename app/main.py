@@ -9,6 +9,7 @@ from app.api.v1.endpoints import field
 from app.api.v1.endpoints import history
 from app.api.v1.endpoints import interview
 from app.api.v1.endpoints import post
+from app.api.v1.endpoints import company
 
 app = FastAPI()
 
@@ -21,3 +22,4 @@ app.include_router(field.router, prefix="/api/v1")
 app.include_router(history.router, prefix="/api/v1")
 app.include_router(interview.router, prefix="/api/v1")
 app.include_router(post.router, prefix="/api/v1")
+app.include_router(company.router, prefix="/api/v1")
