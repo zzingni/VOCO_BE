@@ -16,3 +16,4 @@ class Interview(Base):
     answers = relationship("Answer", back_populates="interview")
     field = relationship("Field")
     member = relationship("Member", back_populates="interviews")
+    company = relationship("Company", back_populates="interviews")
