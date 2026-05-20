@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, TIMESTAMP, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, TIMESTAMP, ForeignKey, BigInteger
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 
@@ -12,6 +12,8 @@ class Interview(Base):
     id = Column(Integer, primary_key=True, index=True)
     interview_date = Column(TIMESTAMP, server_default=func.now())
     field_id = Column(Integer, ForeignKey("field.id"), nullable=False)
+    company_id = Column(BigInteger, ForeignKey("company.company_id"), nullable=True)
+
     # Answer 와 1:N 관계
     answers = relationship("Answer", back_populates="interview")
     field = relationship("Field")

@@ -23,6 +23,7 @@ from app.models.sentence_feedback import SentenceFeedback
 from app.models.voice_feedback import VoiceFeedback
 from app.models.interview import Interview
 from app.models.field import Field
+from app.models.company import Company
 
 from app.services.repeated_word_service import (
     save_repeated_words
@@ -51,18 +52,26 @@ async def stt(
     if not question:
         return {"error": "Invalid question_id"}
 
-    # 면접 분야 조회
+    # 면접 분야 및 기업 조회
     interview = db.query(Interview).filter(
         Interview.id == interview_id
     ).first()
     
     field_name = None
+    company_name = None
     if interview:
         field = db.query(Field).filter(
             Field.id == interview.field_id
         ).first()
         if field:
             field_name = field.sub_category
+            
+        if interview.company_id:
+            company = db.query(Company).filter(
+                Company.company_id == interview.company_id
+            ).first()
+            if company:
+                company_name = company.company_name
 
     # 3. 임시 wav 저장
     with NamedTemporaryFile(
@@ -108,7 +117,8 @@ async def stt(
         feedback_result = await generate_feedback(
             question.content,
             text,
-            field_name
+            field_name,
+            company_name
         )
 
         # 8. Sentence Feedback 저장

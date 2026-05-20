@@ -12,12 +12,14 @@ router = APIRouter()
 @router.post("/interview/start")
 def start_interview(
     db: Session = Depends(get_db),
-    field_id: int = Form(...)
+    field_id: int = Form(...),
+    company_id: int = Form(None)
 ):
 
     interview = Interview(
         user_id=1,
-        field_id = field_id
+        field_id = field_id,
+        company_id=company_id
     )
 
     db.add(interview)
