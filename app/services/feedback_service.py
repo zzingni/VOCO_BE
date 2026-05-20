@@ -2,8 +2,15 @@ from app.core.openai_client import client
 import json
 
 
-async def generate_feedback(question: str, answer: str, field_name: str = None):
+async def generate_feedback(
+        question: str,
+        answer: str,
+        field_name: str = None,
+        company_name: str = None
+):
     field_context = ""
+    company_context = ""
+
     if field_name:
         field_context = f"""
     [지원 분야]
@@ -11,19 +18,35 @@ async def generate_feedback(question: str, answer: str, field_name: str = None):
 
     * 추가 지시사항:
     지원 분야({field_name})에서 현재 실무적으로 가장 요구되는 핵심 역량이나 트렌드를 파악하고,
-    지원자의 답변이 해당 역량을 얼마나 잘 어필하고 있는지 피드백 내용에 반드시 반영할 것. """
+    지원자의 답변이 해당 역량을 얼마나 잘 어필하고 있는지 피드백 내용에 반드시 반영할 것.
+    """
+
+    if company_name:
+        company_context = f"""
+    [희망 기업]
+    {company_name}
+
+    * 추가 지시사항:
+    {company_name}이 최근 추구하는 인재상, 핵심 가치, 조직 문화,
+    채용 방향성 등을 분석하여 지원자의 답변이 해당 기업과 얼마나 적합한지 평가에 반영할 것.
+
+    단, 과도한 추측은 피하고 일반적으로 알려진 기업 성향 및 채용 방향을 기반으로 판단할 것.
+    """
 
     prompt = f"""
     아래는 면접 질문과 지원자의 답변이다.
+
     {field_context}
-    
+
+    {company_context}
+
     [질문]
     {question}
 
     [답변]
     {answer}
 
-    너는 해당 지원 분야 {field_name} 실무 면접관이다.
+    너는 면접 평가자다.
 
     아래 평가 기준에 따라 답변을 분석하여 점수를 계산하고 점수와 함께 한줄 피드백을 제공하라.
 
