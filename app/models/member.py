@@ -20,3 +20,4 @@ class Member(Base):
 
     posts = relationship("Post", back_populates="member")
     comments = relationship("Comment", back_populates="member")
+    resume = relationship("Resume", back_populates="member",uselist=False)

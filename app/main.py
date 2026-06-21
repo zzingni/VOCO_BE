@@ -11,6 +11,7 @@ from app.api.v1.endpoints import interview
 from app.api.v1.endpoints import post
 from app.api.v1.endpoints import company
 from app.api.v1.endpoints import job
+from app.api.v1.endpoints import dashboard
 
 app = FastAPI()
 
@@ -25,3 +26,4 @@ app.include_router(interview.router, prefix="/api/v1")
 app.include_router(post.router, prefix="/api/v1")
 app.include_router(company.router, prefix="/api/v1")
 app.include_router(job.router, prefix="/api/v1")
+app.include_router(dashboard.router, prefix="/api/v1")

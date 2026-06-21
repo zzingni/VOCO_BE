@@ -13,6 +13,6 @@ async def process_audio(audio_path: str):
             file=audio_file
         )
 
-    print("📝 STT 결과:", transcript.text)
+    print("STT Result:", transcript.text)
 
     return transcript.text

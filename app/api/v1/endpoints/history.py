@@ -55,6 +55,9 @@ def get_interview_history(
 
             "interview_date": interview.interview_date,
 
+            "company_id": interview.company_id,
+            "company_name": interview.company.company_name if interview.company else None,
+
             "field": {
                 "id": field.id,
                 "main_category": field.main_category,
@@ -63,7 +66,7 @@ def get_interview_history(
 
             "average_score":
                 round(float(avg_score), 1)
-                if avg_score else 0
+                if avg_score is not None else None
         })
 
     overall_average = round(total_score / valid_score_count, 1) if valid_score_count > 0 else 0
